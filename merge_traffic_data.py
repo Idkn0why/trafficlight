@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import json
 
 # 读取数据文件，指定nds_id和next_nds_id为字符串类型
 inferred_df = pd.read_csv('data/inferred_traffic_light_info.txt', sep='\t', 
@@ -29,9 +30,9 @@ def compare_data_sources(inferred_df, reconstructed_df):
                 common_records.append({
                     'nds_id': row['nds_id'],
                     'next_nds_id': row['next_nds_id'],
-                    'dir': row['dir'],
-                    'inferred_green_start': row['inferred_green_start'],
-                    'reconstructed_green_start': reconstructed_row.iloc[0]['inferred_green_start'],
+                    'dir': int(row['dir']),
+                    'inferred_green_start': float(row['inferred_green_start']),
+                    'reconstructed_green_start': float(reconstructed_row.iloc[0]['inferred_green_start']),
                 })
     
     # 转换为DataFrame
@@ -68,8 +69,8 @@ print(f"方向: {max_diff_record['dir']}")
 print(f"推断绿灯开始时间: {max_diff_record['inferred_green_start']}")
 print(f"重构绿灯开始时间: {max_diff_record['reconstructed_green_start']}")
 
-# 创建合并后的DataFrame
-merged_data = []
+# 创建合并后的数据字典
+merged_data = {}
 
 # 统计变量
 total_records = len(inferred_df)
@@ -80,6 +81,8 @@ found_in_reconstructed = 0
 
 # 处理inferred数据
 for _, row in inferred_df.iterrows():
+    key = f"{row['nds_id']}_{row['next_nds_id']}_{row['dir']}"
+    
     if row['coverage_rate'] < 0.8 or row['covered_vehicles'] == 1:
         if row['coverage_rate'] < 0.8:
             low_coverage_records += 1
@@ -97,50 +100,50 @@ for _, row in inferred_df.iterrows():
             found_in_reconstructed += 1
             replaced_records += 1
             # 使用reconstructed的数据
-            merged_data.append({
+            merged_data[key] = {
                 'nds_id': str(row['nds_id']),
                 'next_nds_id': str(row['next_nds_id']),
-                'dir': row['dir'],
-                'cycle_length': reconstructed_row.iloc[0]['cycle_length'],
-                'green_start': reconstructed_row.iloc[0]['inferred_green_start'],
-                'green_time': reconstructed_row.iloc[0]['green_time'],
-                'vehicle_count': row['vehicle_count'],
-                'covered_vehicles': row['covered_vehicles'],
-                'coverage_rate': row['coverage_rate'],
+                'dir': int(row['dir']),
+                'cycle_length': float(reconstructed_row.iloc[0]['cycle_length']),
+                'green_start': float(reconstructed_row.iloc[0]['inferred_green_start']),
+                'green_time': float(reconstructed_row.iloc[0]['green_time']),
+                'vehicle_count': int(row['vehicle_count']),
+                'covered_vehicles': int(row['covered_vehicles']),
+                'coverage_rate': float(row['coverage_rate']),
                 'data_source': 'method1'
-            })
+            }
         else:
             # 如果没有找到对应的reconstructed数据，保留inferred数据
-            merged_data.append({
+            merged_data[key] = {
                 'nds_id': str(row['nds_id']),
                 'next_nds_id': str(row['next_nds_id']),
-                'dir': row['dir'],
-                'cycle_length': row['cycle_length'],
-                'green_start': row['inferred_green_start'],
-                'green_time': row['green_time'],
-                'vehicle_count': row['vehicle_count'],
-                'covered_vehicles': row['covered_vehicles'],
-                'coverage_rate': row['coverage_rate'],
+                'dir': int(row['dir']),
+                'cycle_length': float(row['cycle_length']),
+                'green_start': float(row['inferred_green_start']),
+                'green_time': float(row['green_time']),
+                'vehicle_count': int(row['vehicle_count']),
+                'covered_vehicles': int(row['covered_vehicles']),
+                'coverage_rate': float(row['coverage_rate']),
                 'data_source': 'method2'
-            })
+            }
     else:
         # 使用inferred数据
-        merged_data.append({
+        merged_data[key] = {
             'nds_id': str(row['nds_id']),
             'next_nds_id': str(row['next_nds_id']),
-            'dir': row['dir'],
-            'cycle_length': row['cycle_length'],
-            'green_start': row['inferred_green_start'],
-            'green_time': row['green_time'],
-            'vehicle_count': row['vehicle_count'],
-            'covered_vehicles': row['covered_vehicles'],
-            'coverage_rate': row['coverage_rate'],
+            'dir': int(row['dir']),
+            'cycle_length': float(row['cycle_length']),
+            'green_start': float(row['inferred_green_start']),
+            'green_time': float(row['green_time']),
+            'vehicle_count': int(row['vehicle_count']),
+            'covered_vehicles': int(row['covered_vehicles']),
+            'coverage_rate': float(row['coverage_rate']),
             'data_source': 'method2'
-        })
+        }
 
-# 转换为DataFrame并保存
-merged_df = pd.DataFrame(merged_data)
-merged_df.to_csv('data/merged_traffic_light_info.txt', sep='\t', index=False)
+# 保存为JSON文件
+with open('data/merged_traffic_light_info.json', 'w', encoding='utf-8') as f:
+    json.dump(merged_data, f, ensure_ascii=False, indent=2)
 
 # 打印统计信息
 print("\n数据合并统计信息：")
