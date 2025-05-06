@@ -59,6 +59,7 @@ def reconstruct_traffic_light(cycle_data, phase_data):
             cycle_time = cycle_row['cycle_time']
             green_time = cycle_row['green_time']
             red_time = cycle_row['red_time']
+            way=cycle_row['way']
             
             # 记录cycle_data的键
             cycle_key = (inter_id, nds_id, dir_value)
@@ -102,7 +103,8 @@ def reconstruct_traffic_light(cycle_data, phase_data):
                 'cycle_start': first_cycle_start,
                 'cycle_time': cycle_time,
                 'green_time': green_time,
-                'red_time': red_time
+                'red_time': red_time,
+                'way': way
             })
             used_cycle_keys.add(cycle_key)
     

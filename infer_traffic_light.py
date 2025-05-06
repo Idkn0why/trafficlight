@@ -50,8 +50,10 @@ def analyze_light_cycle(trajectory_data, cycle_data):
                               (cycle_data['dir'] == dir_val)]
         
         if not cycle_info.empty:
+            inter_id = cycle_info['inter_id'].iloc[0]
             cycle_length = cycle_info['cycle_time'].iloc[0]
             green_time = cycle_info['green_time'].iloc[0]
+            way = cycle_info['way'].iloc[0]
             
             # 计算相对时间
             relative_times = get_relative_time(row['exit_time'], cycle_length)
@@ -59,6 +61,7 @@ def analyze_light_cycle(trajectory_data, cycle_data):
             # 在周期内滑动窗口，寻找最佳绿灯开始时间
             best_start = 0
             max_covered = 0
+            best_distance = float('inf')  # 初始化为无穷大
             
             # 以0.1秒为步长滑动窗口
             for start in np.arange(0, cycle_length, 1):
@@ -76,11 +79,35 @@ def analyze_light_cycle(trajectory_data, cycle_data):
                 if covered > max_covered:
                     max_covered = covered
                     best_start = start
+                    best_distance = float('inf')  # 重置为无穷大
+                elif covered == max_covered and covered > 0:
+                    # 如果覆盖度相同，则覆盖的数据点处于中间越好
+                    # 计算当前窗口内覆盖点的平均位置
+                    if end > start:
+                        # 正常情况：窗口不跨越周期
+                        covered_points = [t for t in relative_times if start <= t <= end]
+                    else:
+                        # 窗口跨越周期的情况
+                        covered_points = [t for t in relative_times if t >= start or t <= end]
+                    
+                    # 计算覆盖点的平均位置
+                    avg_position = np.mean(covered_points)
+                    # 计算窗口中心点
+                    window_center = (start + green_time/2) % cycle_length
+                    # 计算与窗口中心的距离
+                    distance_to_center = min(abs(avg_position - window_center), 
+                                          cycle_length - abs(avg_position - window_center))
+                    
+                    # 如果当前窗口的覆盖点更接近中心，则更新最佳起始时间
+                    if best_distance == float('inf') or distance_to_center < best_distance:
+                        best_distance = distance_to_center
+                        best_start = start
             
             # 计算覆盖率
             coverage_rate = max_covered / len(relative_times)
             
             results.append({
+                'inter_id': inter_id,
                 'nds_id': nds_id,
                 'next_nds_id': next_nds_id,
                 'dir': dir_val,
@@ -89,7 +116,8 @@ def analyze_light_cycle(trajectory_data, cycle_data):
                 'green_time': green_time,
                 'vehicle_count': len(relative_times),
                 'covered_vehicles': max_covered,
-                'coverage_rate': coverage_rate
+                'coverage_rate': coverage_rate,
+                'way': way
             })
     
     return pd.DataFrame(results)

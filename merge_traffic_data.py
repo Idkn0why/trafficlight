@@ -101,6 +101,7 @@ for _, row in inferred_df.iterrows():
             replaced_records += 1
             # 使用reconstructed的数据
             merged_data[key] = {
+                'inter_id': str(row['inter_id']),
                 'nds_id': str(row['nds_id']),
                 'next_nds_id': str(row['next_nds_id']),
                 'dir': int(row['dir']),
@@ -110,11 +111,13 @@ for _, row in inferred_df.iterrows():
                 'vehicle_count': int(row['vehicle_count']),
                 'covered_vehicles': int(row['covered_vehicles']),
                 'coverage_rate': float(row['coverage_rate']),
+                'way':int(row['way']),
                 'data_source': 'method1'
             }
         else:
             # 如果没有找到对应的reconstructed数据，保留inferred数据
             merged_data[key] = {
+                'inter_id': str(row['inter_id']),
                 'nds_id': str(row['nds_id']),
                 'next_nds_id': str(row['next_nds_id']),
                 'dir': int(row['dir']),
@@ -124,11 +127,13 @@ for _, row in inferred_df.iterrows():
                 'vehicle_count': int(row['vehicle_count']),
                 'covered_vehicles': int(row['covered_vehicles']),
                 'coverage_rate': float(row['coverage_rate']),
+                'way':int(row['way']),
                 'data_source': 'method2'
             }
     else:
         # 使用inferred数据
         merged_data[key] = {
+            'inter_id': str(row['inter_id']),
             'nds_id': str(row['nds_id']),
             'next_nds_id': str(row['next_nds_id']),
             'dir': int(row['dir']),
@@ -138,6 +143,7 @@ for _, row in inferred_df.iterrows():
             'vehicle_count': int(row['vehicle_count']),
             'covered_vehicles': int(row['covered_vehicles']),
             'coverage_rate': float(row['coverage_rate']),
+            'way':int(row['way']),
             'data_source': 'method2'
         }
 
