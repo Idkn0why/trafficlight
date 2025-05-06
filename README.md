@@ -1,7 +1,3 @@
-# 路口转向关系分析
-
-这个项目用于分析轨迹数据中的路口转向关系，计算路口之间的平均转向角度和标准差。
-
 ## 项目结构
 
 ```
@@ -10,18 +6,49 @@
 ├── process_road_connections.py
 └── data/                    # 数据文件夹（不包含在git中）
     ├── trajectory_20250329.txt
-    └── intersection_turns.txt
+    └── DATA0329.txt
 ```
 
 ## 数据说明
 
 - `trajectory_20250329.txt`: 原始轨迹数据文件
-- `intersection_turns.txt`: 处理后的路口转向关系数据
+- `DATA0329.txt`: 原始信号灯数据文件
 
 ## 使用方法
 
-1. 将轨迹数据文件放在 `data` 文件夹下
-2. 运行处理脚本：
+1. 将数据文件放在 `data` 文件夹下
+2. 信号灯数据分析：
+```bash
+python filter_data_by_link.py
+python analyze_traffic_data.py
+```
+选取16h数据并补全
+```bash
+python complete_16h_data.py
+python merge_timing_data.py
+```
+3. 轨迹数据处理：
+注意方法1和方法2在filter_trajectory_by_time.py有所不同，需要更改条件
+```bash
+python filter_trajectory_by_time.py
+python filter_trajectory_by_link.py
+python filter_trajectory_by_light.py
+```
+4. 相位推测方法1：
+```bash
+python infer_traffic_light_method1.py
+python traffic_light_reconstruction.py
+```
+5. 相位推测方法2：
+```bash
+python process_trajectory.py
+python infer_traffic_light.py
+```
+6. 合并相位数据：
+```bash
+python merge_traffic_data.py
+```
+7. 推测道路连接关系：
 ```bash
 python process_road_connections.py
 ```
