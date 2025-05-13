@@ -1,5 +1,6 @@
 # 数据文件夹
 data/
+visualizations/
 
 # Python相关
 __pycache__/

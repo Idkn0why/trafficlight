@@ -3,7 +3,8 @@
 ```
 .
 ├── README.md
-├── process_road_connections.py
+├── xxx.py
+├── visualizations           # 信号灯可视化文件（不在git）
 └── data/                    # 数据文件夹（不包含在git中）
     ├── trajectory_20250329.txt
     └── DATA0329.txt
@@ -47,8 +48,15 @@ python infer_traffic_light.py
 6. 合并相位数据：
 ```bash
 python merge_traffic_data.py
+python inter_id_group.py
 ```
-7. 推测道路连接关系：
+8. 信号灯冲突处理：
+```bash
+python traffic_light_optimizer.py
+python visualize_traffic_lights.py
+```
+
+9. 推测道路连接关系：
 ```bash
 python process_road_connections.py
 ```
