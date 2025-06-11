@@ -45,6 +45,7 @@ python traffic_light_reconstruction.py
 python process_trajectory.py
 python infer_traffic_light.py
 ```
+
 6. 合并相位数据：
 ```bash
 python merge_traffic_data.py
@@ -60,6 +61,15 @@ python visualize_traffic_lights.py
 ```bash
 python process_road_connections.py
 ```
+
+10. 相位推测方法3：
+直接按照简单4相位配时
+```bash
+python filter_inters_full_info_by_signal_info.py
+python visualize_signal_info.py
+```
+
+
 
 ## 输出说明
 
